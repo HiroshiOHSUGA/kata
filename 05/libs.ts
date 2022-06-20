@@ -26,3 +26,20 @@ export function mod(size: number): (num: number) => number {
     return num % size;
   };
 }
+
+const ALPHABETS =
+  "abcdefghijklmnopqrstuvwwxyz" + "abcdefghijklmnopqrstuvwwxyz".toUpperCase();
+const getRandomAlphabet = (): string => {
+  const index = Math.floor(ALPHABETS.length * Math.random());
+  return ALPHABETS.charAt(index);
+};
+
+export const getRandomWord = (
+  maxChar: number = 5,
+  exact: boolean = false
+): string => {
+  return new Array(exact ? maxChar : Math.ceil(maxChar * Math.random()))
+    .fill(0)
+    .map(getRandomAlphabet)
+    .join("");
+};
