@@ -14,11 +14,16 @@ for await (let line of reader) {
 
 const BITMAP_SIZE = indexList.length * BITMAP_SCALE;
 
-console.log(
-  indexList.reduce((result, indexes) => {
-    indexes.forEach((index) => {
-      result[mod(result.length)(index)] = true;
-    });
-    return result;
-  }, new Array(BITMAP_SIZE))
-);
+const bloomMap = indexList.reduce((result, indexes) => {
+  indexes.forEach((index) => {
+    result[mod(result.length)(index)] = true;
+  });
+  return result;
+}, new Array(BITMAP_SIZE));
+console.log({
+  words: indexList.length,
+  hashPerWord: HASH_COUNT,
+  BITMAP_SCALE,
+  BITMAP_SIZE,
+  usedBit: bloomMap.filter(() => true).length,
+});
