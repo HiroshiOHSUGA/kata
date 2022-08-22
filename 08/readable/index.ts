@@ -1,46 +1,11 @@
-import { loadTextbook } from "../libs/textbook/loadTextbook.ts";
+import { findAnswers } from "./libs/findAnswers.ts";
+import { loadWordDB } from "./libs/loadWordDB.ts";
+import type { WordDB } from "./types.d.ts";
 const TEXTBOOK_PATH = "./data/wordlist-small.txt";
 const TARGET_WORD_LENGTH = 6;
-const textbookWords = await loadTextbook({ textbookPath: TEXTBOOK_PATH });
 
-type WordDB = Record<number, string[]>;
-const wordDB: WordDB = textbookWords
-  .filter((word) => word.length <= TARGET_WORD_LENGTH)
-  .reduce((result, word) => {
-    const length = word.length;
+const wordDB: WordDB = await loadWordDB(TEXTBOOK_PATH, TARGET_WORD_LENGTH);
 
-    return {
-      ...result,
-      [length]: [...(result[length] ?? []), word],
-    };
-  }, {} as WordDB);
-
-const findWords = (
-  db: WordDB,
-  a: number,
-  b: number
-): [string, string, string][] => {
-  const left = db[a];
-  const right = db[b];
-  const answer = db[a + b];
-
-  return answer
-    .filter((ans) => {
-      return left.some((l) => {
-        return right.some((r) => {
-          return l + r === ans;
-        });
-      });
-    })
-    .map((word) => {
-      return [word, word.slice(0, a), word.slice(a)];
-    });
-};
-
-for (let i = 1; i < TARGET_WORD_LENGTH; i++) {
-  const answers = findWords(wordDB, i, TARGET_WORD_LENGTH - i);
-
-  answers.forEach(([answer, left, right]) =>
-    console.log([left, "+", right, "=", answer].join(" "))
-  );
-}
+findAnswers(wordDB, TARGET_WORD_LENGTH).forEach(([answer, left, right]) =>
+  console.log([left, "+", right, "=", answer].join(" "))
+);
