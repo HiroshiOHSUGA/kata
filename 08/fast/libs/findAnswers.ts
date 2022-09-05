@@ -25,14 +25,13 @@ const findWordPairs = (
 
   return answer
     .filter((ans) => {
-      return left.some((l) => {
-        return right.some((r) => {
-          return l + r === ans;
-        });
-      });
+      const answerL = ans.slice(0, leftLength);
+      const answerR = ans.slice(leftLength);
+      return (
+        left.some((l) => l === answerL) && right.some((r) => r === answerR)
+      );
     })
     .map((word) => {
       return [word, word.slice(0, leftLength), word.slice(leftLength)];
     });
 };
-
