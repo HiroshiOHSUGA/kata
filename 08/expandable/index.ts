@@ -1,14 +1,21 @@
 import { loadWordDB } from "./libs/loadWordDB.ts";
 import type { WordDB, FindAnswers } from "./types.d.ts";
 import * as flags from "https://deno.land/std@0.154.0/flags/mod.ts";
+import * as path from "https://deno.land/std@0.152.0/path/mod.ts";
+
 const {
   file = "./data/wordlist.txt",
   length = 6,
-  finderPath = "./libs/findAnswers.ts",
+  finderPath,
 } = flags.parse(Deno.args);
 const TEXTBOOK_PATH = file;
 const TARGET_WORD_LENGTH = length;
-const finder: { findAnswers: FindAnswers } = await import(finderPath);
+const FINDER_IMPORT_PATH =
+  finderPath === undefined ? "./libs/findAnswers.ts" : toAbsPath(finderPath);
+function toAbsPath(relPath: string, base: string = Deno.cwd()): string {
+  return path.normalize(path.join(base, relPath));
+}
+const finder: { findAnswers: FindAnswers } = await import(FINDER_IMPORT_PATH);
 
 console.time("loadWordDB");
 const wordDB: WordDB = await loadWordDB(TEXTBOOK_PATH, TARGET_WORD_LENGTH);
