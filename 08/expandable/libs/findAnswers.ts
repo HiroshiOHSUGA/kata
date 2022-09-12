@@ -1,9 +1,6 @@
-import { WordDB, AnswerPair } from "../types.d.ts";
+import { WordDB, AnswerPair, PairFinder } from "../types.d.ts";
 
-export function findAnswers(
-  db: WordDB,
-  targetWordLength: number
-): AnswerPair[] {
+const findAnswers: PairFinder = (db: WordDB, targetWordLength: number) => {
   let result: AnswerPair[] = [];
   for (let i = 1; i < targetWordLength; i++) {
     const answers: AnswerPair[] = findWordPairs(db, i, targetWordLength - i);
@@ -12,7 +9,7 @@ export function findAnswers(
   }
 
   return result;
-}
+};
 
 const findWordPairs = (
   db: WordDB,
@@ -35,3 +32,5 @@ const findWordPairs = (
       return [word, word.slice(0, leftLength), word.slice(leftLength)];
     });
 };
+
+export default findAnswers;

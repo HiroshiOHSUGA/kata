@@ -1,9 +1,6 @@
-import { WordDB } from "../types.d.ts";
+import { WordDB, DBLoader } from "../types.d.ts";
 import { loadTextbook } from "../../libs/textbook/loadTextbook.ts";
-export async function loadWordDB(
-  path: string,
-  targetWordLength: number
-): Promise<WordDB> {
+const loadWordDB: DBLoader = async (path, targetWordLength) => {
   const textbookWords = await loadTextbook({ textbookPath: path });
   return textbookWords
     .filter((word) => word.length <= targetWordLength)
@@ -15,4 +12,6 @@ export async function loadWordDB(
         [length]: [...(result[length] ?? []), word],
       };
     }, {} as WordDB);
-}
+};
+
+export default loadWordDB;

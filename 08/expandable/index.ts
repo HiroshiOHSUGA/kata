@@ -1,4 +1,4 @@
-import type { WordDB, FindAnswers, Printer } from "./types.d.ts";
+import type { DBLoader, PairFinder, Printer } from "./types.d.ts";
 import * as flags from "https://deno.land/std@0.154.0/flags/mod.ts";
 import { toAbsPath } from "./libs/toAbsPath.ts";
 
@@ -19,23 +19,22 @@ const DB_LOADER_PATH =
 const PRINTER_PATH =
   dbLoaderPath === undefined ? "./libs/printer.ts" : toAbsPath(printerPath);
 
-const finder: { findAnswers: FindAnswers } = await import(FINDER_IMPORT_PATH);
-const dbLoader: {
-  loadWordDB: (textPath: string, targetLength: number) => WordDB;
+const { default: finder }: { default: PairFinder } = await import(
+  FINDER_IMPORT_PATH
+);
+const {
+  default: dbLoader,
+}: {
+  default: DBLoader;
 } = await import(DB_LOADER_PATH);
-const printer: {
-  print: Printer;
-} = await import(PRINTER_PATH);
+const { default: printer }: { default: Printer } = await import(PRINTER_PATH);
 
 console.time("loadWordDB");
-const wordDB: WordDB = await dbLoader.loadWordDB(
-  TEXTBOOK_PATH,
-  TARGET_WORD_LENGTH
-);
+const wordDB = await dbLoader(TEXTBOOK_PATH, TARGET_WORD_LENGTH);
 console.timeEnd("loadWordDB");
 
 console.time("findAnswers");
-finder
-  .findAnswers(wordDB, TARGET_WORD_LENGTH)
-  .forEach(([answer, left, right]) => printer.print(answer, left, right));
+finder(wordDB, TARGET_WORD_LENGTH).forEach(([answer, left, right]) =>
+  printer(answer, left, right)
+);
 console.timeEnd("findAnswers");
