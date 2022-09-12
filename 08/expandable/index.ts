@@ -12,22 +12,25 @@ const {
 const TEXTBOOK_PATH = file;
 const TARGET_WORD_LENGTH = length;
 
-const FINDER_IMPORT_PATH =
-  finderPath === undefined ? "./libs/findAnswers.ts" : toAbsPath(finderPath);
-const DB_LOADER_PATH =
-  dbLoaderPath === undefined ? "./libs/loadWordDB.ts" : toAbsPath(dbLoaderPath);
-const PRINTER_PATH =
-  dbLoaderPath === undefined ? "./libs/printer.ts" : toAbsPath(printerPath);
+function getFlagPathValue(
+  path: string | undefined,
+  defaultPath: string
+): string {
+  return path === undefined ? defaultPath : toAbsPath(path);
+}
+async function importDefaultModule<T extends unknown>(
+  path: string
+): Promise<T> {
+  const { default: defaultModule }: { default: T } = await import(path);
+  return defaultModule;
+}
+const FINDER_PATH = getFlagPathValue(finderPath, "./libs/findAnswers.ts");
+const DB_LOADER_PATH = getFlagPathValue(dbLoaderPath, "./libs/loadWordDB.ts");
+const PRINTER_PATH = getFlagPathValue(printerPath, "./libs/printer.ts");
 
-const { default: finder }: { default: PairFinder } = await import(
-  FINDER_IMPORT_PATH
-);
-const {
-  default: dbLoader,
-}: {
-  default: DBLoader;
-} = await import(DB_LOADER_PATH);
-const { default: printer }: { default: Printer } = await import(PRINTER_PATH);
+const finder = await importDefaultModule<PairFinder>(FINDER_PATH);
+const dbLoader = await importDefaultModule<DBLoader>(DB_LOADER_PATH);
+const printer = await importDefaultModule<Printer>(PRINTER_PATH);
 
 console.time("loadWordDB");
 const wordDB = await dbLoader(TEXTBOOK_PATH, TARGET_WORD_LENGTH);
