@@ -7,15 +7,25 @@ const {
   file = "./data/wordlist.txt",
   length = 6,
   finderPath,
+  dbLoaderPath,
 } = flags.parse(Deno.args);
 const TEXTBOOK_PATH = file;
 const TARGET_WORD_LENGTH = length;
 const FINDER_IMPORT_PATH =
   finderPath === undefined ? "./libs/findAnswers.ts" : toAbsPath(finderPath);
+const DB_LOADER_PATH =
+  dbLoaderPath === undefined ? "./libs/loadWordDB.ts" : toAbsPath(dbLoaderPath);
+
 const finder: { findAnswers: FindAnswers } = await import(FINDER_IMPORT_PATH);
+const dbLoader: {
+  loadWordDB: (textPath: string, targetLength: number) => WordDB;
+} = await import(DB_LOADER_PATH);
 
 console.time("loadWordDB");
-const wordDB: WordDB = await loadWordDB(TEXTBOOK_PATH, TARGET_WORD_LENGTH);
+const wordDB: WordDB = await dbLoader.loadWordDB(
+  TEXTBOOK_PATH,
+  TARGET_WORD_LENGTH
+);
 console.timeEnd("loadWordDB");
 
 console.time("findAnswers");
